@@ -1,14 +1,21 @@
 const mysql = require('mysql')
 require('dotenv').config({ path: `${__dirname}/.env` })
+const configDb = require('./config')
 
-console.log(process.env);
+const connection = mysql.createConnection({
+    host: configDb.host,
+    user: configDb.user,
+    port: configDb.port,
+    password: configDb.password,
+    database: configDb.database
+})
 
-module.exports = function getDB() {
-    const connection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME
-    })
-    return connection.connect()
-}
+connection.connect((err) => {
+    if (err) {
+        console.error('Error connecting to database: ' + err.stack);
+        return;
+    }
+    console.log('Connected to database as id ' + connection.threadId);
+});
+
+module.exports = connection;
